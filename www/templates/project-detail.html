@@ -1,0 +1,26 @@
+<ion-view view-title="{{project.name}}">
+  <ion-content class="padding">
+    <!-- <img ng-src="{{chat.face}}" style="width: 64px; height: 64px"> -->
+    <!-- <p>
+      {{project.description}}
+    </p> -->
+    <div class="list card">
+
+      <div class="item item-avatar">
+        <img src="http://tutupash.com/site/assets/nin_logo.jpeg">
+        <h2>{{project.name}}</h2>
+        <p>{{project.description}}</p>
+      </div>
+
+      <div class="item item-image">
+        <!-- <img src="http://ecx.images-amazon.com/images/I/41D5vU4I1NL.jpg"> -->
+      </div>
+
+      <a class="item item-icon-left assertive" href="#/tab/project/{{project.id}}/appointment">
+        <i class="icon ion-clock"></i>
+        Apontamento de horas
+      </a>
+
+    </div>
+  </ion-content>
+</ion-view>

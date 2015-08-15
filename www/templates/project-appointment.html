@@ -1,0 +1,40 @@
+<ion-view view-title="{{project.name}}">
+  <ion-content class="padding">
+    <ul class="list">
+
+      <p>{{today}}</p>
+  	  <li class="item item-checkbox">
+        <label class="checkbox">
+          <input type="checkbox" ng-click="checkin()">
+        </label>
+        Checkin
+        <span class="positive">{{appointment.checkin}}</span>
+      </li>
+
+  	  <li class="item item-checkbox">
+        <label class="checkbox">
+          <input type="checkbox"  ng-click="breakin()">
+        </label>
+        Break in
+        <span class="positive">{{appointment.breakin}}</span>
+      </li>
+
+  	  <li class="item item-checkbox">
+        <label class="checkbox">
+          <input type="checkbox" ng-click="breakout()">
+        </label>
+        Break out
+        <span class="positive">{{appointment.breakout}}</span>
+      </li>
+
+  	  <li class="item item-checkbox">
+        <label class="checkbox">
+          <input type="checkbox"  ng-click="checkout()">
+        </label>
+        Checkout
+        <span class="positive">{{appointment.checkout}}</span>
+  	  </li>
+
+	 </ul>
+  </ion-content>
+</ion-view>
