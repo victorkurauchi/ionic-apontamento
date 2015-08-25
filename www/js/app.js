@@ -7,6 +7,12 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 'starter.services'])
 
+.constant("PocketPointingConstants", {
+  "HOST": "http://localhost:3000",
+  "PORT": "",
+  "LOCAL_STORAGE": "APP_POCKET_LOGGED"
+})
+
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard

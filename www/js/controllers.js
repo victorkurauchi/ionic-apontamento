@@ -1,48 +1,173 @@
 angular.module('starter.controllers', [])
 
-.controller('SigninCtrl', function($scope, Project) {
+.controller('SigninCtrl', function($scope, LoginService, $state, $ionicLoading, Utils, UserService) {
+  $scope.login = {};
 
+  $scope.doLogin = function(login) {
+    $ionicLoading.show({
+      template: 'Aguarde...'
+    });
+    if (login.email && login.password) {
+      login.password = CryptoJS.MD5(login.password).toString();
+      LoginService.doLogin(login)
+      .then(function(result) {
+        UserService.setLogged(result.data)
+        .then(function(logged) {
+          $ionicLoading.hide();
+          $state.go('tab.dash');
+        });
+      }, function(error) {
+        $ionicLoading.hide();
+        Utils.showAlert(error.data.reason);
+      });
+    }
+  }
 })
+
 .controller('SignupCtrl', function($scope, Project) {
 
 })
 
-.controller('DashCtrl', function($scope, Project) {
+.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils) {
+  var user = UserService.getLogged();
 
-  var projetos = Project.all();
-
-  $scope.projetos = projetos;
+  if (! user) {
+    $state.go('signin');
+  } else {
+    Project.allFromUser(user.companyId)
+    .then(function(result) {
+      $scope.projetos = result.data.projects;
+    }, function(error) {
+      Utils.showAlert(error.data.reason);
+    });
+  }
 })
 
 .controller('ProjectDetailCtrl', function($scope, $stateParams, Project) {
-  $scope.project = Project.get($stateParams.id);
+  Project.get($stateParams.id)
+  .then(function(result) {
+    var _project = result.data;
+    if (_project) {
+      $scope.project = _project;
+      Project.setCurrentProjectInSession(_project);
+    }
+  }, function(error) {
+    Utils.showAlert(error.data.reason);
+  });
 })
 
-.controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment) {
+.controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment, UserService, Utils) {
   $scope.appointment = {};
   $scope.today = moment().format("LLLL");
-  $scope.project = Project.get($stateParams.id);
+  $scope.project = Project.getCurrentProjectInSession($stateParams.id);
 
-  var appointment = $scope.appointment;
+  var user = UserService.getLogged();
+  var data = {};
+  var project = $scope.project;
+
+  data.projectId = project._id;
+  data.projectName = project.name;
+  data.companyId = project.companyId;
 
   $scope.checkin = function() {
-    appointment.checkin = moment().format("HH:mm:ss");
-    //send to api
+    if (! user) {
+      Utils.showAlert("Você precisa estar logado para prosseguir :)");
+    } else {
+      data.checkin = new Date().toString();
+      data.userId = user._id;
+      $scope.appointment.userId = data.userId;
+
+      Appointment.add(data)
+      .then(function(result){
+        $scope.appointment.checkin = moment().format("HH:mm:ss");
+        $scope.appointment._id = result.data._id;
+      }, function(error) {
+        console.log(error);
+        Utils.showAlert("Serviço indisponível, tente em instantes. ");
+      });
+    }
   };
 
   $scope.breakin = function() {
-    appointment.breakin = moment().format("HH:mm:ss");
-    //send to api
+    if (! $scope.appointment.userId) {
+      Utils.showAlert("Você precisa estar logado para prosseguir :)");
+      return;
+    }
+
+    if (! $scope.appointment._id) {
+      Utils.showAlert("Seu apontamento não foi gerado corretamente. É necessário um id");
+    } else {
+      var info = {};
+      info.breakin = new Date().toString();
+      info.userId = $scope.appointment.userId;
+      info._id = $scope.appointment._id;
+
+      Appointment.update(info)
+      .then(function(result){
+        console.log(result);
+        if (! result.data.updated) {
+          Utils.showAlert("Não foi possível atualizar seu breakin");
+        } else {
+          $scope.appointment.breakin = moment().format("HH:mm:ss");
+        }
+      }, function(error) {
+        Utils.showAlert("Serviço indisponível, tente em instantes. ");
+      });
+    }
   };
 
   $scope.breakout = function() {
-    appointment.breakout = moment().format("HH:mm:ss");
-    //send to api
+    if (! $scope.appointment.userId) {
+      Utils.showAlert("Você precisa estar logado para prosseguir :)");
+      return;
+    }
+
+    if (! $scope.appointment._id) {
+      Utils.showAlert("Seu apontamento não foi gerado corretamente. É necessário um id");
+    } else {
+      var info = {};
+      info.breakout = new Date().toString();
+      info.userId = $scope.appointment.userId;
+      info._id = $scope.appointment._id;
+
+      Appointment.update(info)
+      .then(function(result){
+        if (! result.data.updated) {
+          Utils.showAlert("Não foi possível atualizar seu breakin");
+        } else {
+          $scope.appointment.breakout = moment().format("HH:mm:ss");
+        }
+      }, function(error) {
+        Utils.showAlert("Serviço indisponível, tente em instantes. ");
+      });
+    }
   };
 
   $scope.checkout = function() {
-    appointment.checkout = moment().format("HH:mm:ss");
-    //send to api
+    if (! $scope.appointment.userId) {
+      Utils.showAlert("Você precisa estar logado para prosseguir :)");
+      return;
+    }
+
+    if (! $scope.appointment._id) {
+      Utils.showAlert("Seu apontamento não foi gerado corretamente. É necessário um id");
+    } else {
+      var info = {};
+      info.checkout = new Date().toString();
+      info.userId = $scope.appointment.userId;
+      info._id = $scope.appointment._id;
+
+      Appointment.update(info)
+      .then(function(result){
+        if (! result.data.updated) {
+          Utils.showAlert("Não foi possível atualizar seu breakin");
+        } else {
+          $scope.appointment.checkout = moment().format("HH:mm:ss");
+        }
+      }, function(error) {
+        Utils.showAlert("Serviço indisponível, tente em instantes. ");
+      });
+    }
   };
 })
 
@@ -50,7 +175,7 @@ angular.module('starter.controllers', [])
   var getDaysInMonth = function(month,year) {
     // Here January is 1 based
     //Day 0 is the last day in the previous month
-    
+
    return new Date(year, month, 0).getDate();
   };
 
@@ -59,32 +184,12 @@ angular.module('starter.controllers', [])
   var schedule = [];
 
   for (var i = total; i > 0; i--) {
-    console.log(i);
     schedule.push(i);
   };
 
   $scope.days = schedule;
 
   // get from api the month appointments of the user
-})
-
-.controller('ChatsCtrl', function($scope, Chats) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  };
-})
-
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
 })
 
 .controller('AccountCtrl', function($scope) {
