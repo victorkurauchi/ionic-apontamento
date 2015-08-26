@@ -5,7 +5,8 @@
       <p>{{today}}</p>
   	  <li class="item item-checkbox">
         <label class="checkbox">
-          <input type="checkbox" ng-click="checkin()">
+          <input type="checkbox" ng-click="checkin()" ng-if="appointment.checkin" checked>
+          <input type="checkbox" ng-click="checkin()" ng-if="!appointment.checkin">
         </label>
         Checkin
         <span class="positive">{{appointment.checkin}}</span>
@@ -13,7 +14,8 @@
 
   	  <li class="item item-checkbox">
         <label class="checkbox">
-          <input type="checkbox"  ng-click="breakin()">
+          <input type="checkbox"  ng-click="breakin()" ng-if="appointment.breakin" checked>
+          <input type="checkbox"  ng-click="breakin()" ng-if="!appointment.breakin">
         </label>
         Break in
         <span class="positive">{{appointment.breakin}}</span>
@@ -21,7 +23,8 @@
 
   	  <li class="item item-checkbox">
         <label class="checkbox">
-          <input type="checkbox" ng-click="breakout()">
+          <input type="checkbox" ng-click="breakout()" ng-if="appointment.breakout" checked>
+          <input type="checkbox" ng-click="breakout()" ng-if="!appointment.breakout" >
         </label>
         Break out
         <span class="positive">{{appointment.breakout}}</span>
@@ -29,7 +32,8 @@
 
   	  <li class="item item-checkbox">
         <label class="checkbox">
-          <input type="checkbox"  ng-click="checkout()">
+          <input type="checkbox"  ng-click="checkout()" ng-if="appointment.checkout" checked>
+          <input type="checkbox"  ng-click="checkout()" ng-if="!appointment.checkout" >
         </label>
         Checkout
         <span class="positive">{{appointment.checkout}}</span>

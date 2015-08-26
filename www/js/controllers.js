@@ -56,7 +56,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment, UserService, Utils) {
+.controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment, UserService, Utils, $state) {
   $scope.appointment = {};
   $scope.today = moment().format("LLLL");
   $scope.project = Project.getCurrentProjectInSession($stateParams.id);
@@ -69,11 +69,37 @@ angular.module('starter.controllers', [])
   data.projectName = project.name;
   data.companyId = project.companyId;
 
+  if (! user._id) {
+    $state.go('signin');
+  } else {
+    var day = new Date().getDate();
+    Appointment.getFromCurrentDay(user._id, day)
+    .then(function(result) {
+      if (result.data) {
+        handleFields(result.data);
+      }
+    }, function(error) {
+      Utils.showAlert(error.data.reason);
+    })
+  }
+
+  function handleFields(appointment) {
+    var appoint = $scope.appointment;
+    for (var x in appointment) {
+      var element = appointment[x];
+      if (moment(element).isValid()) {
+        element = new Date(element);
+        element = moment(element).format("HH:mm:ss");
+      }
+      appoint[x] = element;
+    }
+  }
+
   $scope.checkin = function() {
     if (! user) {
       Utils.showAlert("Você precisa estar logado para prosseguir :)");
     } else {
-      data.checkin = new Date().toString();
+      data.checkin = new Date();
       data.userId = user._id;
       $scope.appointment.userId = data.userId;
 
@@ -98,7 +124,7 @@ angular.module('starter.controllers', [])
       Utils.showAlert("Seu apontamento não foi gerado corretamente. É necessário um id");
     } else {
       var info = {};
-      info.breakin = new Date().toString();
+      info.breakin = new Date();
       info.userId = $scope.appointment.userId;
       info._id = $scope.appointment._id;
 
@@ -126,7 +152,7 @@ angular.module('starter.controllers', [])
       Utils.showAlert("Seu apontamento não foi gerado corretamente. É necessário um id");
     } else {
       var info = {};
-      info.breakout = new Date().toString();
+      info.breakout = new Date();
       info.userId = $scope.appointment.userId;
       info._id = $scope.appointment._id;
 
@@ -153,7 +179,7 @@ angular.module('starter.controllers', [])
       Utils.showAlert("Seu apontamento não foi gerado corretamente. É necessário um id");
     } else {
       var info = {};
-      info.checkout = new Date().toString();
+      info.checkout = new Date();
       info.userId = $scope.appointment.userId;
       info._id = $scope.appointment._id;
 

@@ -95,6 +95,10 @@ angular.module('starter.services', [])
     remove: function(chat) {
       projects.splice(projects.indexOf(chat), 1);
     },
+    getFromCurrentDay: function(userId, day) {
+      var endpoint = PocketPointingConstants.HOST + "/api/appointments/user/" + userId + "/day/" + day;
+      return $http({method: "GET", url: endpoint, responseType: "json"});
+    },
     get: function(projectId) {
       for (var i = 0; i < projects.length; i++) {
         if (projects[i].id === parseInt(projectId)) {

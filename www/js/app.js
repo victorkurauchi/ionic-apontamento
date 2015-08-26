@@ -5,13 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 'starter.services'])
-
-.constant("PocketPointingConstants", {
-  "HOST": "http://localhost:3000",
-  "PORT": "",
-  "LOCAL_STORAGE": "APP_POCKET_LOGGED"
-})
+angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 'starter.services', 'pocket.constants'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

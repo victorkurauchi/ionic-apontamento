@@ -1,17 +1,42 @@
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var bower = require('bower');
-var concat = require('gulp-concat');
-var sass = require('gulp-sass');
+var gulp      = require('gulp');
+var gutil     = require('gulp-util');
+var bower     = require('bower');
+var concat    = require('gulp-concat');
+var sass      = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
-var rename = require('gulp-rename');
-var sh = require('shelljs');
+var rename    = require('gulp-rename');
+var sh        = require('shelljs');
+var replace   = require('gulp-replace-task');
+var args      = require('yargs').argv;
+var fs        = require('fs');
+var path      = require('path');
 
 var paths = {
   sass: ['./scss/**/*.scss']
 };
 
-gulp.task('default', ['sass']);
+gulp.task('default', ['sass', 'replace']);
+
+gulp.task('replace', function () {
+  // Get the environment from the command line
+  var env = args.env || 'dev';
+
+  // Read the settings from the right file
+  var filename = env + '.json';
+  var settings = JSON.parse(fs.readFileSync('./www/config/' + filename, 'utf8'));
+
+// Replace each placeholder with the correct value for the variable.
+gulp.src('./www/config/constants.js')
+  .pipe(replace({
+    patterns: [
+      {
+        match: 'apiUrl',
+        replacement: settings.apiUrl
+      }
+    ]
+  }))
+  .pipe(gulp.dest('./www/js'));
+});
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')
