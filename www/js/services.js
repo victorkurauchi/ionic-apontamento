@@ -55,6 +55,7 @@ angular.module('starter.services', [])
         });
       }
       var endpoint = PocketPointingConstants.HOST + "/api/company/" + companyId +  "/projects";
+      console.log(endpoint);
       return $http({method: "GET", url: endpoint, responseType: "json", timeout: 5000, cache: false});
     },
     get: function(projectId) {

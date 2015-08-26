@@ -28,19 +28,24 @@ angular.module('starter.controllers', [])
 })
 
 .controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils, $timeout) {
+  console.log("wtf");
   var user = UserService.getLogged();
 
   if (! user ) {
     $state.go('signin');
   } else {
     Utils.displayLoading();
+    console.log("we need to call");
+
     Project.allFromUser(user.companyId)
     .then(function(result) {
+          console.log("finished");
       Utils.hideLoading();
       $timeout(function() {
         $scope.projetos = result.data.projects;
       });
     }, function(error) {
+          console.log("damn...");
       Utils.hideLoading();
       Utils.showAlert(error.data.reason);
     });

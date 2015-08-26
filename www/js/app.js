@@ -34,6 +34,7 @@ angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 
   $stateProvider
 
   .state('signin', {
+    cache: false,
     url: '/signin',
     templateUrl: 'templates/signin.html',
     controller: 'SigninCtrl'
@@ -55,6 +56,7 @@ angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 
   // Each tab has its own nav history stack:
 
   .state('tab.dash', {
+    cache: false,
     url: '/dash',
     views: {
       'tab-dash': {
@@ -76,6 +78,7 @@ angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 
   // })
 
   .state('tab.project-appointment', {
+    cache: false,
     url: '/project/:id/appointment',
     views: {
       'tab-dash': {
