@@ -27,7 +27,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils) {
+.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils, $timeout) {
   var user = UserService.getLogged();
 
   if (! user ) {
@@ -37,7 +37,9 @@ angular.module('starter.controllers', [])
     Project.allFromUser(user.companyId)
     .then(function(result) {
       Utils.hideLoading();
-      $scope.projetos = result.data.projects;
+      $timeout(function() {
+        $scope.projetos = result.data.projects;
+      });
     }, function(error) {
       Utils.hideLoading();
       Utils.showAlert(error.data.reason);
