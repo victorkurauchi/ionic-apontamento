@@ -16,6 +16,9 @@ angular.module('starter.services', [])
       return $q(function(resolve, reject) {
         resolve(user);
       });
+    },
+    destroy: function() {
+      $window.localStorage.removeItem(storage);
     }
   }
 })
@@ -42,7 +45,7 @@ angular.module('starter.services', [])
   return {
     all: function() {
       var endpoint = PocketPointingConstants.HOST + "/publications/api/projects";
-      return $http({method: "GET", url: endpoint, responseType: "json"});
+      return $http({method: "GET", url: endpoint, responseType: "json", timeout: 5000});
     },
     allFromUser: function(companyId) {
       if (!companyId) {
@@ -52,7 +55,7 @@ angular.module('starter.services', [])
         });
       }
       var endpoint = PocketPointingConstants.HOST + "/api/company/" + companyId +  "/projects";
-      return $http({method: "GET", url: endpoint, responseType: "json"});
+      return $http({method: "GET", url: endpoint, responseType: "json", timeout: 5000, cache: false});
     },
     get: function(projectId) {
       var endpoint = PocketPointingConstants.HOST + "/api/projects/" + projectId;
@@ -93,33 +96,36 @@ angular.module('starter.services', [])
     remove: function(chat) {
       projects.splice(projects.indexOf(chat), 1);
     },
-    getFromCurrentDay: function(userId, day) {
-      var endpoint = PocketPointingConstants.HOST + "/api/appointments/user/" + userId + "/day/" + day;
+    getFromCurrentDay: function(userId, day, projectId) {
+      var endpoint = PocketPointingConstants.HOST + "/api/appointments/user/" + userId + "/day/" + day + "/project/" + projectId;
       return $http({method: "GET", url: endpoint, responseType: "json"});
-    },
-    get: function(projectId) {
-      for (var i = 0; i < projects.length; i++) {
-        if (projects[i].id === parseInt(projectId)) {
-          return projects[i];
-        }
-      }
-      return null;
     }
   };
 })
 
-.factory('Utils', function($ionicPopup) {
+.factory('Utils', function($ionicPopup, $ionicLoading) {
   var showAlert = function(message, title) {
    var alertPopup = $ionicPopup.alert({
      title: title || 'Ooops!',
      template: message || 'Erro interno'
    });
    alertPopup.then(function(res) {
-     console.log('Thank you for not eating my delicious ice cream cone');
    });
   };
 
+  var displayLoading = function(message) {
+    $ionicLoading.show({
+      template: message || 'Aguarde...'
+    });
+  };
+
+  var hideLoading = function() {
+    $ionicLoading.hide();
+  };
+
   return {
-    showAlert: showAlert
+    showAlert: showAlert,
+    displayLoading: displayLoading,
+    hideLoading: hideLoading
   };
 })

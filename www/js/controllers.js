@@ -1,23 +1,22 @@
 angular.module('starter.controllers', [])
 
-.controller('SigninCtrl', function($scope, LoginService, $state, $ionicLoading, Utils, UserService) {
+.controller('SigninCtrl', function($scope, LoginService, $state, Utils, UserService) {
   $scope.login = {};
 
   $scope.doLogin = function(login) {
-    $ionicLoading.show({
-      template: 'Aguarde...'
-    });
+    Utils.displayLoading();
     if (login.email && login.password) {
       login.password = CryptoJS.MD5(login.password).toString();
       LoginService.doLogin(login)
       .then(function(result) {
         UserService.setLogged(result.data)
         .then(function(logged) {
-          $ionicLoading.hide();
+          Utils.hideLoading();
+          $scope.login = {};
           $state.go('tab.dash');
         });
       }, function(error) {
-        $ionicLoading.hide();
+        Utils.hideLoading();
         Utils.showAlert(error.data.reason);
       });
     }
@@ -28,45 +27,22 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils, $ionicModal) {
+.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils) {
   var user = UserService.getLogged();
 
-  if (! user) {
+  if (! user ) {
     $state.go('signin');
   } else {
+    Utils.displayLoading();
     Project.allFromUser(user.companyId)
     .then(function(result) {
+      Utils.hideLoading();
       $scope.projetos = result.data.projects;
     }, function(error) {
-      console.log(error);
+      Utils.hideLoading();
       Utils.showAlert(error.data.reason);
     });
   }
-
-  $ionicModal.fromTemplateUrl('templates/modal-appointment.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-  $scope.openModal = function() {
-    $scope.modal.show();
-  };
-  $scope.closeModal = function() {
-    $scope.modal.hide();
-  };
-  //Cleanup the modal when we're done with it!
-  $scope.$on('$destroy', function() {
-    $scope.modal.remove();
-  });
-  // Execute action on hide modal
-  $scope.$on('modal.hidden', function() {
-    // Execute action
-  });
-  // Execute action on remove modal
-  $scope.$on('modal.removed', function() {
-    // Execute action
-  });
 })
 
 .controller('ProjectDetailCtrl', function($scope, $stateParams, Project) {
@@ -97,12 +73,13 @@ angular.module('starter.controllers', [])
     Project.get($stateParams.id)
     .then(function(result) {
       $scope.project = result.data;
+
       project = $scope.project;
       data.projectId = project._id;
       data.projectName = project.name;
       data.companyId = project.companyId;
 
-      Appointment.getFromCurrentDay(user._id, day)
+      Appointment.getFromCurrentDay(user._id, day, data.projectId)
       .then(function(result) {
         if (result.data) {
           handleFields(result.data);
@@ -257,4 +234,9 @@ angular.module('starter.controllers', [])
   } else {
     $scope.user = user;
   }
+
+  $scope.logout = function() {
+    UserService.destroy();
+    $state.go('signin');
+  };
 });
