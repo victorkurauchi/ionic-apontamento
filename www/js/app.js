@@ -64,15 +64,16 @@ angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 
     }
   })
 
-  .state('tab.project-detail', {
-    url: '/project/:id',
-    views: {
-      'tab-dash': {
-        templateUrl: 'templates/project-detail.html',
-        controller: 'ProjectDetailCtrl'
-      }
-    }
-  })
+  // not-used anymore
+  // .state('tab.project-detail', {
+  //   url: '/project/:id',
+  //   views: {
+  //     'tab-dash': {
+  //       templateUrl: 'templates/project-detail.html',
+  //       controller: 'ProjectDetailCtrl'
+  //     }
+  //   }
+  // })
 
   .state('tab.project-appointment', {
     url: '/project/:id/appointment',
@@ -83,25 +84,6 @@ angular.module('starter', ['ionic','ionic.service.core', 'starter.controllers', 
       }
     }
   })
-
-  .state('tab.chats', {
-      url: '/chats',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
-        }
-      }
-    })
-    .state('tab.chat-detail', {
-      url: '/chats/:chatId',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/chat-detail.html',
-          controller: 'ChatDetailCtrl'
-        }
-      }
-    })
 
   .state('tab.appointments', {
     url: '/appointments',

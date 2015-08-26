@@ -58,7 +58,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment, UserService, Utils, $state) {
+.controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment, UserService, Utils, $state, $timeout) {
   $scope.appointment = {};
   $scope.today = moment().format("LLLL");
 
@@ -72,21 +72,26 @@ angular.module('starter.controllers', [])
   } else {
     Project.get($stateParams.id)
     .then(function(result) {
-      $scope.project = result.data;
 
-      project = $scope.project;
-      data.projectId = project._id;
-      data.projectName = project.name;
-      data.companyId = project.companyId;
+      // google sugests using $timeout instead $apply()
+      $timeout(function() {
+        $scope.project = result.data;
 
-      Appointment.getFromCurrentDay(user._id, day, data.projectId)
-      .then(function(result) {
-        if (result.data) {
-          handleFields(result.data);
-        }
-      }, function(error) {
-        Utils.showAlert(error.data.reason);
-      })
+        project = $scope.project;
+        data.projectId = project._id;
+        data.projectName = project.name;
+        data.companyId = project.companyId;
+
+        // if the user already registered any appointment for today, we need to handle the checkboxes
+        Appointment.getFromCurrentDay(user._id, day, data.projectId)
+        .then(function(result) {
+          if (result.data) {
+            handleFields(result.data);
+          }
+        }, function(error) {
+          Utils.showAlert(error.data.reason);
+        })
+      });
     }, function(error) {
       Utils.showAlert(error.data.reason);
     });
