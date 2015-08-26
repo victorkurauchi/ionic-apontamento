@@ -1,18 +1,18 @@
 angular.module('starter.services', [])
 
-.factory('UserService', function($q, PocketPointingConstants) {
+.factory('UserService', function($q, PocketPointingConstants, $window) {
   var storage = PocketPointingConstants.LOCAL_STORAGE;
 
   return {
     getLogged: function() {
-      if (localStorage.getItem(storage)) {
-        return JSON.parse(localStorage.getItem(storage));
+      if ($window.localStorage[storage]) {
+        return JSON.parse($window.localStorage[storage]);
       } else {
         return null;
       }
     },
     setLogged: function(user) {
-      localStorage.setItem(storage, JSON.stringify(user));
+      $window.localStorage[storage] = JSON.stringify(user);
       return $q(function(resolve, reject) {
         resolve(user);
       });
@@ -78,8 +78,6 @@ angular.module('starter.services', [])
 })
 
 .factory('Appointment', function($http, UserService, PocketPointingConstants) {
-  var user = UserService.getLogged();
-
   return {
     all: function() {
       return projects;

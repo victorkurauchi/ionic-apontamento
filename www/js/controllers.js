@@ -28,7 +28,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils) {
+.controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils, $ionicModal) {
   var user = UserService.getLogged();
 
   if (! user) {
@@ -38,9 +38,35 @@ angular.module('starter.controllers', [])
     .then(function(result) {
       $scope.projetos = result.data.projects;
     }, function(error) {
+      console.log(error);
       Utils.showAlert(error.data.reason);
     });
   }
+
+  $ionicModal.fromTemplateUrl('templates/modal-appointment.html', {
+    scope: $scope,
+    animation: 'slide-in-up'
+  }).then(function(modal) {
+    $scope.modal = modal;
+  });
+  $scope.openModal = function() {
+    $scope.modal.show();
+  };
+  $scope.closeModal = function() {
+    $scope.modal.hide();
+  };
+  //Cleanup the modal when we're done with it!
+  $scope.$on('$destroy', function() {
+    $scope.modal.remove();
+  });
+  // Execute action on hide modal
+  $scope.$on('modal.hidden', function() {
+    // Execute action
+  });
+  // Execute action on remove modal
+  $scope.$on('modal.removed', function() {
+    // Execute action
+  });
 })
 
 .controller('ProjectDetailCtrl', function($scope, $stateParams, Project) {
@@ -59,28 +85,34 @@ angular.module('starter.controllers', [])
 .controller('ProjectAppointmentCtrl', function($scope, $stateParams, Project, Appointment, UserService, Utils, $state) {
   $scope.appointment = {};
   $scope.today = moment().format("LLLL");
-  $scope.project = Project.getCurrentProjectInSession($stateParams.id);
 
   var user = UserService.getLogged();
   var data = {};
-  var project = $scope.project;
+  var project;
+  var day = new Date().getDate();
 
-  data.projectId = project._id;
-  data.projectName = project.name;
-  data.companyId = project.companyId;
-
-  if (! user._id) {
+  if (! user || ! user._id) {
     $state.go('signin');
   } else {
-    var day = new Date().getDate();
-    Appointment.getFromCurrentDay(user._id, day)
+    Project.get($stateParams.id)
     .then(function(result) {
-      if (result.data) {
-        handleFields(result.data);
-      }
+      $scope.project = result.data;
+      project = $scope.project;
+      data.projectId = project._id;
+      data.projectName = project.name;
+      data.companyId = project.companyId;
+
+      Appointment.getFromCurrentDay(user._id, day)
+      .then(function(result) {
+        if (result.data) {
+          handleFields(result.data);
+        }
+      }, function(error) {
+        Utils.showAlert(error.data.reason);
+      })
     }, function(error) {
       Utils.showAlert(error.data.reason);
-    })
+    });
   }
 
   function handleFields(appointment) {
@@ -218,8 +250,11 @@ angular.module('starter.controllers', [])
   // get from api the month appointments of the user
 })
 
-.controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
+.controller('AccountCtrl', function($scope, UserService, $state) {
+  var user = UserService.getLogged();
+  if (! user) {
+    $state.go('signin');
+  } else {
+    $scope.user = user;
+  }
 });
