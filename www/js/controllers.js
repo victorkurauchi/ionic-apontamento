@@ -3,6 +3,11 @@ angular.module('starter.controllers', [])
 .controller('SigninCtrl', function($scope, LoginService, $state, Utils, UserService) {
   $scope.login = {};
 
+  var user = UserService.getLogged();
+  if (user) {
+    $state.go('tab.dash');
+  }
+
   $scope.doLogin = function(login) {
     Utils.displayLoading();
     if (login.email && login.password) {
@@ -13,7 +18,7 @@ angular.module('starter.controllers', [])
         .then(function(logged) {
           Utils.hideLoading();
           $scope.login = {};
-          $state.go('tab.dash');
+          $state.go('tab.dash', {cache: false});
         });
       }, function(error) {
         Utils.hideLoading();
@@ -28,24 +33,20 @@ angular.module('starter.controllers', [])
 })
 
 .controller('DashCtrl', function($scope, Project, $stateParams, UserService, $state, Utils, $timeout) {
-  console.log("wtf");
   var user = UserService.getLogged();
 
   if (! user ) {
     $state.go('signin');
   } else {
     Utils.displayLoading();
-    console.log("we need to call");
 
     Project.allFromUser(user.companyId)
     .then(function(result) {
-          console.log("finished");
       Utils.hideLoading();
       $timeout(function() {
         $scope.projetos = result.data.projects;
       });
     }, function(error) {
-          console.log("damn...");
       Utils.hideLoading();
       Utils.showAlert(error.data.reason);
     });
