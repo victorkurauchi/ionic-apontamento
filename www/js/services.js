@@ -2,17 +2,23 @@ angular.module('starter.services', [])
 
 .factory('UserService', function($q, PocketPointingConstants, $window) {
   var storage = PocketPointingConstants.LOCAL_STORAGE;
+  var host = PocketPointingConstants.HOST;
 
   return {
     getLogged: function() {
-      if ($window.localStorage[storage]) {
-        return JSON.parse($window.localStorage[storage]);
+      if ($window.localStorage[storage] && $window.localStorage['host']) {
+        if ($window.localStorage['host'] === host) {
+          return JSON.parse($window.localStorage[storage]);
+        } else {
+          return null;
+        }
       } else {
         return null;
       }
     },
     setLogged: function(user) {
       $window.localStorage[storage] = JSON.stringify(user);
+      $window.localStorage['host'] = host;
       return $q(function(resolve, reject) {
         resolve(user);
       });

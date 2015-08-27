@@ -22,7 +22,8 @@ angular.module('starter.controllers', [])
         });
       }, function(error) {
         Utils.hideLoading();
-        Utils.showAlert(error.data.reason);
+        var msg = error.data && error.data.reason ? error.data.reason : "Servidor indisponível";
+        Utils.showAlert(msg);
       });
     }
   }
