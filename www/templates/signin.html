@@ -1,15 +1,15 @@
-<ion-view view-title="Login">
+<ion-view view-title="PocketPointing">
   <ion-content class="padding">
 
     <form class="" ng-submit="doLogin(login)">
       <div class="list">
   		  <label class="item item-input">
   		    <span class="input-label">Email</span>
-  		    <input type="text" autocapitalize="off" ng-model="login.email">
+  		    <input type="text" required autocapitalize="off" ng-model="login.email">
   		  </label>
   		  <label class="item item-input">
   		    <span class="input-label">Senha</span>
-  		    <input type="password" ng-model="login.password">
+  		    <input type="password" required ng-model="login.password">
   		  </label>
   		</div>
   		<div class="padding">

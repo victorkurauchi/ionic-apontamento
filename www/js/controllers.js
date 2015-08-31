@@ -9,21 +9,32 @@ angular.module('starter.controllers', [])
   }
 
   $scope.doLogin = function(login) {
+    var pass,
+      data = {};
+
     Utils.displayLoading();
     if (login.email && login.password) {
-      login.password = CryptoJS.MD5(login.password).toString();
-      LoginService.doLogin(login)
+      pass = login.password;
+      pass = CryptoJS.MD5(pass).toString();
+      data.email = login.email;
+      data.password = pass;
+
+      LoginService.doLogin(data)
       .then(function(result) {
         UserService.setLogged(result.data)
         .then(function(logged) {
           Utils.hideLoading();
           $scope.login = {};
           $state.go('tab.dash', {cache: false});
+        }, function(error) {
+          Utils.hideLoading();
+          Utils.showAlert(error);
         });
       }, function(error) {
+        $scope.login.password = '';
         Utils.hideLoading();
         var msg = error.data && error.data.reason ? error.data.reason : "Servidor indisponível";
-        Utils.showAlert(msg);
+        Utils.showAlert(JSON.stringify(error));
       });
     }
   }

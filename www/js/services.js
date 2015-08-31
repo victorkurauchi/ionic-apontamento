@@ -17,14 +17,20 @@ angular.module('starter.services', [])
       }
     },
     setLogged: function(user) {
-      $window.localStorage[storage] = JSON.stringify(user);
-      $window.localStorage['host'] = host;
       return $q(function(resolve, reject) {
-        resolve(user);
+        if (user._id) {
+          $window.localStorage[storage] = JSON.stringify(user);
+          $window.localStorage['host'] = host;
+          resolve(user);
+        } else {
+          reject("Informações incorretas, impossível continuar");
+        }
+
       });
     },
     destroy: function() {
       $window.localStorage.removeItem(storage);
+      $window.localStorage.removeItem('host');
     }
   }
 })
@@ -81,7 +87,7 @@ angular.module('starter.services', [])
   return {
     doLogin: function(login) {
       var endpoint = PocketPointingConstants.HOST + "/api/users/login";
-      return $http({method: "POST", url: endpoint, responseType: "json", data: login});
+      return $http({method: "POST", url: endpoint, responseType: "json", data: login, timeout: 8000});
     }
   };
 })
